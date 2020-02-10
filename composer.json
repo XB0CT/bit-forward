@@ -1,0 +1,21 @@
+{
+    "name": "xb0ct/bit-forward",
+    "description": "bitForwardlib",
+    "type": "library",
+    "require": {
+        "simplito/elliptic-php": "^1.0",
+        "stephenhill/base58": "^1.1"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "XB0CT",
+            "email": "XB0CT@mail.ru"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "BitForward": "src/"
+        }
+    }
+}
