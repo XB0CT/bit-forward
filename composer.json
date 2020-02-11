@@ -14,8 +14,9 @@
         }
     ],
     "autoload": {
-        "psr-0": {
-            "BitForward": "src/"
-        }
-    }
+        "psr-4": { "BitForward\\": "src/" }
+    },
+    "config": {
+        "optimize-autoloader": true
+    },
 }
