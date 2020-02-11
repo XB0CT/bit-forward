@@ -8,7 +8,7 @@ use Elliptic\EC\Signature;
 use StephenHill\Base58;
 use BN\BN;
 
-class Transport {
+class bitForward {
 	private $privateKey;
 	private $curlOpt;
 	function __construct($options = null) {
