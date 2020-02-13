@@ -17,6 +17,7 @@ class bitForward {
 		$this->b58 = new Base58();
 		if ( isset($options['private']) ) $this->keyFromPrivate($options['private']);
 		if ( isset($options['curl']) ) $this->curlOpt = $options['curl'];
+		if ( isset($options['ap']) ) $this->ap = $options['ap'];
 	}
 	public function hash256($msg) {
 		return hash('sha256', hash('sha256', $msg, true), true);
@@ -40,7 +41,7 @@ class bitForward {
 			$pubKeyHex = $pubkey->encode("hex", true);
 		}
 		$pubhash = $this->hash160(hex2bin($pubKeyHex));
-		echo "public       : ".$this->b58->encode("\x00".$pubhash.$this->checkSum("\x00".$pubhash))."\n";
+		//echo "public       : ".$this->b58->encode("\x00".$pubhash.$this->checkSum("\x00".$pubhash))."\n";
 		return $this->b58->encode("\x00".$pubhash.$this->checkSum("\x00".$pubhash));
 	}
 	public function address($pubKeyHex = null) {
@@ -100,6 +101,13 @@ echo "Address      : ".$b58->encode(TestNet . $scripHash . $checksum)."\n";
 		$pubkey = $this->keyFromSignature($msg, $signature);
 		$address = $this->address( $pubkey->encode("hex", true) );
 		return $address;
+	}
+	public function wif() {
+		if ( !$this->privateKey ) throw new \Exception("Private key missing");
+		$hex = hex2bin("80".$this->getPrivateHex()."01");
+		$checksum = $this->checksum($hex);
+		$hex = $hex.$checksum;
+		return $this->b58->encode($hex);
 	}
 	public function __call($method, $params) {
 		if ( !$this->privateKey ) throw new \Exception("Private key missing");
