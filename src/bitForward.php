@@ -131,8 +131,10 @@ echo "Address      : ".$b58->encode(TestNet . $scripHash . $checksum)."\n";
 		*/
 		$pubkey = $this->privateKey->getPublic(true);
 		$address = $this->address( $pubkey->encode("hex", true) );
-
-		$msg = json_encode($params[0]);
+		$msg = ( isset($params[0]) ? $params[0] : [] );
+		$msg = json_encode($msg);
+		//var_dump($msg);
+		//var_dump($params);
 		$this->errorMessage = "";
 		$this->errorCode    = 0;
 
@@ -173,5 +175,15 @@ echo "Address      : ".$b58->encode(TestNet . $scripHash . $checksum)."\n";
 		$msg['sign'] = $sign;
 		$msg['signer'] = $signer;
 		return $msg;
+	}
+	public function signCheck($recv, $pub) {
+		$recv = json_decode($recv, true);
+		if ( !is_array($recv) ) return false;
+		if ( !isset($recv['data']) ) return false;
+		if ( !isset($recv['sign']) ) return false;
+		$msg   = $recv['data'];
+		$sign  = $recv['sign'];
+		$signAddress = $this->addressFromSignature($msg, $sign);
+		return ($signAddress === $pub);
 	}
 }
