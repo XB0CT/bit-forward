@@ -183,7 +183,17 @@ echo "Address      : ".$b58->encode(TestNet . $scripHash . $checksum)."\n";
 		if ( !isset($recv['sign']) ) return false;
 		$msg   = $recv['data'];
 		$sign  = $recv['sign'];
-		$signAddress = $this->addressFromSignature($msg, $sign);
-		return ($signAddress === $pub);
+		try {
+			$signAddress = $this->addressFromSignature($msg, $sign);
+		} catch (Exception $e) {
+			var_dump($e);
+			$signAddress = "ERROR";
+		}
+		if ( $signAddress !== $pub ) return false;
+		$msg = json_decode($msg, true);
+		$signer = $this->addressFromSignature(json_encode($msg), $sign);
+		$msg['sign'] = $sign;
+		$msg['signer'] = $signer;
+		return $msg;
 	}
 }
