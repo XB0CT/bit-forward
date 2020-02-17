@@ -155,7 +155,7 @@ echo "Address      : ".$b58->encode(TestNet . $scripHash . $checksum)."\n";
 
 		//$this->pm->start('curl_exec');
 		$recv = curl_exec($ch);
-		echo "RECV: {$recv}\n";
+		//echo "RECV: {$recv}\n";
 		$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		if ( $code != 200 ) {
 			$this->errorMessage = $recv;
@@ -163,7 +163,7 @@ echo "Address      : ".$b58->encode(TestNet . $scripHash . $checksum)."\n";
 			return false;
 		}
 		$recv = json_decode($recv, true);
-		var_dump($recv);
+		//var_dump($recv);
 		if ($recv && isset($recv['sign']) ) $sign = $recv['sign'];
 		if ($recv && isset($recv['data']) ) $msg = json_decode($recv['data'], true);
 		if ($msg && isset($msg['error']) && $msg['error']) {
@@ -186,7 +186,6 @@ echo "Address      : ".$b58->encode(TestNet . $scripHash . $checksum)."\n";
 		try {
 			$signAddress = $this->addressFromSignature($msg, $sign);
 		} catch (Exception $e) {
-			var_dump($e);
 			$signAddress = "ERROR";
 		}
 		if ( $signAddress !== $pub ) return false;
