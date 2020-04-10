@@ -219,7 +219,7 @@ class bitForward {
 		$msg['signer'] = $signer;
 		return $msg;
 	}
-	public function createAccount() {
+	public function createAccount($saveFile = true) {
 		$this->genPrivateKey();
 		$res = $this->ping();
 		$private = $this->getPrivateHex();
@@ -230,7 +230,7 @@ require_once __DIR__.\"/vendor/autoload.php\";
 use BitForward\bitForward;
 
 \$bf = new bitForward([
-	'cur'     => 'tBTC',
+  'cur'     => 'tBTC',
   'private' => '{$private}',
   'public'  => '{$public}'
 ]);
