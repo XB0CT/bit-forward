@@ -1,8 +1,6 @@
 <?php
 namespace BitForward;
 
-//require_once __DIR__."/vendor/autoload.php";
-
 use Elliptic\EC;
 use Elliptic\EC\Signature;
 use StephenHill\Base58;
@@ -96,8 +94,6 @@ class bitForward {
 
 		$r = $signature->r->toString('hex');
 		$s = $signature->s->toString('hex');
-		echo "DEBUG DER: ".$signature->toDER('hex')."\n";
-		echo "DEBUG DER: ".$this->b58->encode(hex2bin($signature->toDER('hex')))."\n";
 		//var_dump($r, $s, bin2hex($signature->recoveryParam));
 		return $this->b58->encode(hex2bin(bin2hex($signature->recoveryParam).$r.$s));
 	}
@@ -179,7 +175,7 @@ class bitForward {
 
 		//$this->pm->start('curl_exec');
 		$recv = curl_exec($ch);
-		echo "RECV: {$recv}\n";
+		//echo "RECV: {$recv}\n";
 		$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		if ( $code != 200 ) {
 			$this->errorMessage = $recv;
@@ -228,18 +224,27 @@ class bitForward {
 		$res = $this->ping();
 		$private = $this->getPrivateHex();
 		$public  = $res['signer'];
-		echo 
+		$out = 
 "<?php
 require_once __DIR__.\"/vendor/autoload.php\";
 use BitForward\bitForward;
 
 \$bf = new bitForward([
+	'cur'     => 'tBTC',
   'private' => '{$private}',
   'public'  => '{$public}'
 ]);
 \$res = \$bf->ping();
 echo ( \$res['signer'] == '{$public}' ? \"succes\\n\" : \"error\\n\" );
 ";
-		return $res;
+		echo $out;
+		if ( $saveFile ) {
+			$handle = fopen('_bf_ping.php', 'w');
+			try {
+				fwrite($handle, $out);
+			} finally {
+				fclose($handle);
+			}
+		}
 	}
 }
