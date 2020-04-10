@@ -18,5 +18,10 @@
     },
     "config": {
         "optimize-autoloader": true
+    },
+    "scripts": {
+        "createAccount": [
+            "@php _create_account.php"
+        ]
     }
 }
