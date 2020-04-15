@@ -233,15 +233,30 @@ use BitForward\bitForward;
   'cur'     => 'tBTC',
   'private' => '{$private}',
   'public'  => '{$public}'
-]);
+]);";
+		$ping = $out."
 \$res = \$bf->ping();
-echo ( \$res['signer'] == '{$public}' ? \"succes\\n\" : \"error\\n\" );
+echo ( \$res && \$res['signer'] == '{$public}' ? \"succes\\n\" : \"error\\n\" );
 ";
-		echo $out;
+		$sign = $out.'
+$hash = getenv( strtoupper("HASH") );
+echo "ADDR: {$bf->address()}\n";
+echo "HASH: {$hash}\n";
+echo "SIGN: {$bf->sign($hash)}\n";
+';
+		echo $ping;
 		if ( $saveFile ) {
-			$handle = fopen('_bf_ping.php', 'w');
+			$handle = fopen('bf_ping.php', 'w');
 			try {
-				fwrite($handle, $out);
+				fwrite($handle, $ping);
+			} finally {
+				fclose($handle);
+			}
+		}
+		if ( $saveFile ) {
+			$handle = fopen('bf_sign.php', 'w');
+			try {
+				fwrite($handle, $sign);
 			} finally {
 				fclose($handle);
 			}
