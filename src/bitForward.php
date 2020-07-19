@@ -12,7 +12,7 @@ const csbitForward_error_Key = "Private key missing";
 class bitForward {
 	private $privateKey;
 	private $curlOpt;
-	private $ap = "\x4B\xE0\x00"; // "\x05"
+	public $ap = "\x4B\xE0\x00"; // "\xA4\x0D\xD0"; PB1 "\x05" 
 	private $public;
 	function __construct($options = null) {
 		$this->ec = new EC('secp256k1');
@@ -21,12 +21,14 @@ class bitForward {
 		$this->public = "";
 		$this->cur = "BTC";
 		$this->url = 'https://www.paybit.pro';
+		$this->httpDebug = false;
 		if ( isset($options['private']) ) $this->keyFromPrivate($options['private']);
 		if ( isset($options['curl']) ) $this->curlOpt = $options['curl'];
 		if ( isset($options['ap']) ) $this->ap = $options['ap'];
 		if ( isset($options['public']) ) $this->public = $options['public'];
 		if ( isset($options['cur']) ) $this->cur = $options['cur'];
 		if ( isset($options['url']) ) $this->url = $options['url'];
+		if ( isset($options['httpDebug']) ) $this->httpDebug = $options['httpDebug'];
 		if ( !in_array($this->cur, csbitForward_curList) ) throw new \Exception("Unknown currency");
 	}
 	public function hash256($msg) {
@@ -84,7 +86,7 @@ class bitForward {
 		if ( !$this->privateKey ) throw new \Exception(csbitForward_error_Key);
 		$hash = $this->hash256($str);
 		$signature = $this->privateKey->sign(bin2hex($hash), ["k" => function ($iter) { 
-			return new BN(gmp_strval(gmp_random(250), '10'));
+			return new BN(gmp_strval(gmp_random_bits(250), '10'));
 		}]);
 		/*
 		$signature = $this->privateKey->sign(bin2hex($hash), ["k" => function ($iter) { 
@@ -161,6 +163,7 @@ class bitForward {
 		$method = str_replace("_", "/", $method);
 		$url = "{$this->url}/api/bf/v1/{$this->cur}/{$method}/";
 		$ch  = curl_init($url);
+		curl_setopt($ch, CURLOPT_VERBOSE, $this->httpDebug);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 		curl_setopt($ch, CURLOPT_POST, 1);
@@ -175,7 +178,7 @@ class bitForward {
 
 		//$this->pm->start('curl_exec');
 		$recv = curl_exec($ch);
-		//echo "RECV: {$recv}\n";
+		if ( $this->httpDebug ) echo "RECV: {$recv}\n";
 		$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		if ( $code != 200 ) {
 			$this->errorMessage = $recv;
